@@ -1,0 +1,19 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 19.03.2022, 12:38:01
+    Author     : root
+*/
+
+.lineContainer{
+    height: 50px;
+    padding: 10px;
+}
+
+.inputContainer{
+    width: 100%;
+    float: right;
+}
