@@ -4,9 +4,22 @@ To change this template file, choose Tools | Templates
 and open the template in the editor.
 */
 /* 
-    Created on : 19.03.2022, 12:38:01
-    Author     : root
+    Created on : 19/03/2022
+    Author     : Vincent Dupont
 */
+
+#content{
+    width: 930px;
+    margin: auto;
+    margin-top: 20px;
+}
+
+#inputSection{
+    width: 450px;
+    float: left;
+    margin-top: 50px;
+    margin-right: 40px;
+}
 
 .lineContainer{
     height: 50px;
@@ -14,6 +27,17 @@ and open the template in the editor.
 }
 
 .inputContainer{
-    width: 100%;
     float: right;
+}
+
+.cUnit{
+    margin: 5px;
+}
+
+#tempGauge{
+    float: left;
+    padding-left: 40px;
+    border-left: 10px;
+    border-style: none none none solid;
+    border-color: lightgray;
 }
