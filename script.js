@@ -2,41 +2,38 @@ var PHP_VCC;
 var PHP_VADC;
 var PHP_RDIV;
 var PHP_UNIT;
-var PHP_result;
 
 function setVCC(v) {
     PHP_VCC = v;
-    sendPOST();
 }
 function setVADC(v) {
     PHP_VADC = v;
-    sendPOST();
 }
 function setRDIV(o) {
     PHP_RDIV = o;
-    sendPOST();
 }
 function setUNIT(u) {
     PHP_UNIT = u;
-    sendPOST();
 }
 
-function sendPOST() {
+function sendAJAX() {
     $.ajax({
         url: "ajax.php",
         data: {'VCC': PHP_VCC, 'VADC': PHP_VADC, 'RDIV': PHP_RDIV, 'UNIT': PHP_UNIT},
         success: function (data) {
-            PHP_result = data;
+            PHP_result = JSON.parse(data);
             $('#tempGauge').jqxGauge({
-                value: getTemp()
+                caption: {value: PHP_result.Temperature + '°' + PHP_result.Unit},
+                value: PHP_result.Temperature
             });
         }
     });
 }
 
-function getTemp() {
-    return PHP_result;
-}
+var intervalId = window.setInterval(function(){
+    sendAJAX();
+    //alert("Time's UP");
+}, 500)
 
 $(document).ready(function () {
     // Objects creation
@@ -44,14 +41,14 @@ $(document).ready(function () {
         width: '200px',
         tooltip: true,
         min: 0.01, max: 5,
-        //ticksFrequency: 25.5,
+        //mode: "fixed",
+        //ticksFrequency: 0.001,
         value: 2.5
     });
 
     // VCC
     $("#VCC").jqxComboBox({
         autoComplete: true,
-        //placeHolder: "VCC",
         source: [3.3, 5, 10, 12, 24],
         selectedIndex: 1,
         dropDownHeight: 120,
@@ -61,7 +58,7 @@ $(document).ready(function () {
     // RDIV
     $('#RDIV').jqxNumberInput({
         //unit: "ohm",
-        min: 100,
+        min: 100, max: 100000,
         decimal: 10000
     });
 

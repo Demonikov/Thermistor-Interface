@@ -6,11 +6,9 @@
  * @author Vincent D.
  */
 class Thermistor {
-
     protected $VCC = 5;
     protected $Rdiv = 10000;
     protected $Vadc = 2.5;
-    protected $Temp;
     // Unité accepté: C, F, K
     protected $Unit = "C";
     private $tblConvert = array(array(111.3, -30.0),
@@ -26,20 +24,18 @@ class Thermistor {
         array(0.7579, 110));
 
     function __construct() {
-        $this->Unit = $_GET['UNIT'];
-        if (filter_input(INPUT_GET, 'VCC', FILTER_VALIDATE_FLOAT)) {
+        if (filter_input(INPUT_GET, 'VCC', FILTER_VALIDATE_FLOAT))
             $this->VCC = $_GET['VCC'];
-        }
-        if (filter_input(INPUT_GET, 'RDIV', FILTER_VALIDATE_FLOAT)) {
+        
+        if (filter_input(INPUT_GET, 'RDIV', FILTER_VALIDATE_FLOAT))
             $this->Rdiv = $_GET['RDIV'];
-        }
-        if (filter_input(INPUT_GET, 'VADC', FILTER_VALIDATE_FLOAT)) {
+        
+        if (filter_input(INPUT_GET, 'VADC', FILTER_VALIDATE_FLOAT))
             $this->Vadc = $_GET['VADC'];
-        }
-        if (filter_input(INPUT_GET, 'UNIT', FILTER_VALIDATE_TEXT)) {
-            alert("PHPUNIT" + $this->Unit);
+        
+        //if (filter_input(INPUT_GET, 'UNIT', FILTER_VALIDATE_TEXT))
+        if ($_GET['UNIT'])
             $this->Unit = $_GET['UNIT'];
-        }
 
         $this->calcTemp();
     }
@@ -47,18 +43,14 @@ class Thermistor {
     // Valeur des composantes et température
     public function printPars() {
         echo '<pre>';
-        printf("Vcc:\t %.2f V<br>", $this->VCC);
-        printf("Rdiv:\t %d Ohms<br>", $this->Rdiv);
-        printf("Vadc:\t %.2f V<br><br>", $this->Vadc);
-
-        printf("Température:\t %.2f°", $this->getTemp());
-        printf('%s', $this->Unit);
+        printf("Température:\t %.2f°%s", $this->getTemp(), $this->Unit);
         echo '</pre>';
     }
 
     // Estime la température capté par le transistor selon les équivalences Rt / T connues
     public function calcTemp() {
         $trueRt = ($this->Vadc * $this->Rdiv) / ($this->VCC - $this->Vadc) / 1000;
+        
         if ($trueRt > 111) {
             $this->Temp = -30;
             return;
@@ -66,7 +58,6 @@ class Thermistor {
             $this->Temp = 110;
             return;
         }
-
 
         // On situe Rt par rapport a la table des valeurs connues
         for ($i = 0; $i < 28; $i++) {
@@ -81,13 +72,7 @@ class Thermistor {
                 $B = ($this->tblConvert[$i][1] - ($M * $this->tblConvert[$i][0]));
 
                 // Variable calculés
-                /*
-                  echo '<pre>';
-                  printf("Rt:\t %.2f K<br>", $trueRt);
-                  printf("Pente:\t%.2f<br>", $M);
-                  printf("Base:\t %.2f<br>", $B);
-                  echo '</pre>';
-                 */
+                //alert("Rt:\t %.2f K\nPente:\t%.2f\nBase:\t %.2f\n", $trueRt, $M, $B);
 
                 $this->Temp = $M * $trueRt + $B;
                 return;
@@ -97,31 +82,15 @@ class Thermistor {
 
     // Retourne la température dans l'unité configuré
     public function getTemp() {
-        // En kelvin
-        if ($this->Unit == 'K') {
-            $this->Temp += 273.15;
+        switch($this->Unit){
+            case 'K':
+                $this->Temp += 273.15;
+                break;
+            case 'F':
+                $this->Temp = ($this->Temp * 9 / 5) + 32;
+                break;
         }
-        // En fahrenheit
-        else if ($this->Unit == 'F') {
-            $this->Temp = ($this->Temp * 9 / 5) + 32;
-        }
-        // En celsius
-        return $this->Temp;
-    }
 
-    /*
-      public function setVCC($v) {
-      alert("AHH");
-      $this->VCC = $v;
-      //calcTemp();
-      }
-      public function getVCC() {
-      return $this->VCC;
-      }
-      public function getRdiv() {
-      return $this->Rdiv;
-      }
-      public function getVadc() {
-      return $this->Vadc;
-      } */
+        return json_encode( array("Temperature" => number_format( (float) $this->Temp, 2), "Unit" => $this->Unit) );
+    }
 }

@@ -2,6 +2,6 @@
 
 require_once 'classThermistor.php';
 
-$obj1 = new Thermistor();
+$Therm1 = new Thermistor();
 
-echo $obj1->getTemp();
+echo $Therm1->getTemp();
