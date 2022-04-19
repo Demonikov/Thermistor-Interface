@@ -1,30 +1,17 @@
-var PHP_VCC;
-var PHP_VADC;
-var PHP_RDIV;
-var PHP_UNIT;
-
-function setVCC(v) {
-    PHP_VCC = v;
-}
-function setVADC(v) {
-    PHP_VADC = v;
-}
-function setRDIV(o) {
-    PHP_RDIV = o;
-}
-function setUNIT(u) {
-    PHP_UNIT = u;
-}
+var AJAX_VCC;
+var AJAX_VADC;
+var AJAX_RDIV;
+var AJAX_UNIT;
 
 function sendAJAX() {
     $.ajax({
         url: "ajax.php",
-        data: {'VCC': PHP_VCC, 'VADC': PHP_VADC, 'RDIV': PHP_RDIV, 'UNIT': PHP_UNIT},
+        data: {'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT},
         success: function (data) {
-            PHP_result = JSON.parse(data);
+            AJAX_result = JSON.parse(data);
             $('#tempGauge').jqxGauge({
-                caption: {value: PHP_result.Temperature + '°' + PHP_result.Unit},
-                value: PHP_result.Temperature
+                caption: {value: AJAX_result.Temperature + '°' + AJAX_result.Unit},
+                value: AJAX_result.Temperature
             });
         }
     });
@@ -66,10 +53,10 @@ $(document).ready(function () {
     $('.cUnit').jqxRadioButton({ width: 140, height: 25 });
 
     $('#tempGauge').jqxGauge({ value: 25 });
-
+    
     /* Function déclenché par interaction */
     $('#VADC').on('change', function (event) {
-        setVADC(event.args.value);
+        AJAX_VADC = event.args.value;
     });
 
     // bind to 'select' event.
@@ -81,11 +68,11 @@ $(document).ready(function () {
         }
 
         $('#VADC').jqxSlider({max: vcc});
-        setVCC(vcc);
+        AJAX_VCC = vcc;
     });
 
     $('#RDIV').on('valueChanged', function () {
-        setRDIV($('#RDIV').val());
+        AJAX_RDIV = $('#RDIV').val();
     });
 
     $('.cUnit').on('checked', function () {
@@ -95,13 +82,13 @@ $(document).ready(function () {
         if ($('#UNIT_F').jqxRadioButton('checked')) {
             gMax = 230;
             gMin = -22;
-            setUNIT('F');
+            AJAX_UNIT = 'F';
         } else if ($('#UNIT_K').jqxRadioButton('checked')) {
             gMax = 383.15;
             gMin = 243.15;
-            setUNIT('K');
+            AJAX_UNIT = 'K';
         } else {
-            setUNIT('C');
+            AJAX_UNIT = 'C';
         }
 
         // For gauge color strokes
@@ -120,5 +107,4 @@ $(document).ready(function () {
     });
 
     $('#UNIT_C').jqxRadioButton({checked: true});
-
 });
