@@ -1,7 +1,7 @@
-var AJAX_VCC;
-var AJAX_VADC;
-var AJAX_RDIV;
-var AJAX_UNIT;
+var AJAX_VCC = 5;
+var AJAX_RDIV = 10000;
+var AJAX_VADC = 2.5;
+var AJAX_UNIT = 'C';
 
 function sendAJAX() {
     $.ajax({
@@ -17,17 +17,23 @@ function sendAJAX() {
     });
 }
 
+function sendSQL(){
+
+}
+
+
+
+
 var intervalId = window.setInterval(function(){
     sendAJAX();
-    //alert("Time's UP");
-}, 500)
+}, 3000)
 
 $(document).ready(function () {
     // Objects creation
     $('#VADC').jqxSlider({
         width: '200px',
         tooltip: true,
-        min: 0.01, max: 5,
+        min: 0.01, max: AJAX_VCC,
         //mode: "fixed",
         //ticksFrequency: 0.001,
         value: 2.5
@@ -46,7 +52,7 @@ $(document).ready(function () {
     $('#RDIV').jqxNumberInput({
         //unit: "ohm",
         min: 100, max: 100000,
-        decimal: 10000
+        decimal: AJAX_RDIV
     });
 
     // Unit radios
