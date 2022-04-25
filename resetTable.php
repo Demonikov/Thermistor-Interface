@@ -1,13 +1,22 @@
 <?php
 $db = $_GET['DB'];
 
-$sql_con = mysqli_connect("localhost", "phpmyadmin", "phpmyadmin", $db);
-if (!$sql_con)
-	die("Could not connect:" . mysqli_error());
+$con = new mysqli("localhost", "phpmyadmin", "phpmyadmin", $db);
+
+if ($con->connect_error)
+	die("Could not connect:" . $con->mysqli_error());
 
 $sql = "DELETE FROM temperature";
-mysqli_query($sql_con, $sql);
+$result = $con->query($sql);
 $sql = "ALTER TABLE temperature AUTO_INCREMENT=1";
-$result = mysqli_query($sql_con, $sql);
+$result = $con->query($sql);
 
-mysqli_close($sql_con);
+if($result->num_rows > 0){
+	while($row = $result->fetch_assoc()){
+		echo json_encode( array("Temperature" => $row["Temperature"], "Unit" => $row["Unit"], "Time" => $row["Time"]) );
+	}
+}else{
+	echo "No data";
+}
+
+$con->close();
