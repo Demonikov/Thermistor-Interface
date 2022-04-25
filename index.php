@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>LAB 4</title>
+        <title>LAB 6</title>
 
         <link rel="stylesheet" href="w3.css">
         <link rel="stylesheet" href="../jqwidgets/jqwidgets/styles/jqx.base.css">
@@ -30,7 +30,8 @@
 
     <nav>
         <div class="w3-container w3-bar w3-light-grey">
-            <a href="index.php" class="w3-bar-item w3-button">Remise à zéro</a>
+            <input type="button" class="w3-bar-item w3-button" value="Remise à zéro" onclick="reset()">
+            <input type="button" class="w3-bar-item w3-button" value="Affichage" onclick="changeDisplay()">
         </div>
     </nav>
 

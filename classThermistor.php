@@ -93,15 +93,15 @@ class Thermistor {
 
     public function sendToDB() {
 	$db = "schema";
-	$con = mysqli_connect("localhost", "phpmyadmin", "phpmyadmin", $db);
-	if (!$con)
+	$sql_con = mysqli_connect("localhost", "phpmyadmin", "phpmyadmin", $db);
+	if (!$sql_con)
 		die("Could not connect:" . mysqli_error());
 
 	$this->Vadc = number_format( (float) $this->Vadc, 2);
 	$sql = "INSERT INTO temperature (Temperature, Unit, Vcc, Vadc, Rdiv) VALUES " .
 		"('$this->Temp', '$this->Unit' , '$this->Vcc' , '$this->Vadc' , '$this->Rdiv')";
-	$result = mysqli_query($con, $sql);
+	$result = mysqli_query($sql_con, $sql);
 
-	mysqli_close($con);
+	mysqli_close($sql_con);
     }
 }

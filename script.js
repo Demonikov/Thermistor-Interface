@@ -3,30 +3,31 @@ var AJAX_RDIV = 10000;
 var AJAX_VADC = 2.5;
 var AJAX_UNIT = 'C';
 
-function sendAJAX() {
-    $.ajax({
-        url: "ajax.php",
-        data: {'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT},
-        success: function (data) {
-            AJAX_result = JSON.parse(data);
-            $('#tempGauge').jqxGauge({
-                caption: {value: AJAX_result.Temperature + '°' + AJAX_result.Unit},
-                value: AJAX_result.Temperature
-            });
-        }
-    });
+function reset(){
+	$.ajax({
+		url: "resetTable.php",
+		data: {'DB': "schema"}
+	});
 }
 
-function sendSQL(){
-
+function changeDisplay(){
+	$.getJSON("lastTemp.php", {'DB': "schema"}, function(json) {
+		$('#tempGauge').jqxGauge({
+			caption: {value: json.Temperature + '°' + json.Unit},
+			value: json.Temperature
+            	});
+	});
 }
-
-
 
 
 var intervalId = window.setInterval(function(){
-    sendAJAX();
-}, 3000)
+	$.ajax({
+        	url: "ajax.php",
+        	data: {'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT}
+
+    	});
+	changeDisplay();
+}, 1000)
 
 $(document).ready(function () {
     // Objects creation
