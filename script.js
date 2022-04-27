@@ -10,24 +10,28 @@ function reset(){
 	});
 }
 
-function changeDisplay(){
-	$.getJSON("lastTemp.php", {'DB': "schema"}, function(json) {
-		$('#tempGauge').jqxGauge({
-			caption: {value: json.Temperature + '°' + json.Unit},
-			value: json.Temperature
-				});
+function getLastTemp(){
+	$.getJSON("lastTemp.php",
+		{'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val')},
+		function(json) {
+			$('#tempChart').jqxChart({
+				source: json
+			});
+			$('#tempGauge').jqxGauge({
+				caption: {value: json[0].Temperature + '°' + json[0].Unit},
+				value: json[0].Temperature
+			});
 	});
 }
 
 
 var intervalId = window.setInterval(function(){
 	$.ajax({
-			url: "ajax.php",
-			data: {'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT}
-
+		url: "ajax.php",
+		data: {'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT}
 		});
-	changeDisplay();
-}, 5000)
+	getLastTemp();
+}, 500)
 
 $(document).ready(function () {
 	// Objects creation
@@ -35,8 +39,6 @@ $(document).ready(function () {
 		width: '200px',
 		tooltip: true,
 		min: 0.01, max: AJAX_VCC,
-		//mode: "fixed",
-		//ticksFrequency: 0.001,
 		value: 2.5
 	});
 
@@ -60,9 +62,35 @@ $(document).ready(function () {
 	$('.cUnit').jqxRadioButton({ width: 140, height: 25 });
 
 	$('#tempGauge').jqxGauge({ value: 25 });
-	$('tempChart').jqxChart(settings)
+	$('#tempChart').jqxChart({
+		title: "Graphique des températures",
+		description: "Compilation des dernières mesures",
+		//source: sampleData,
+		categoryAxis: { dataField: 'Time' },
+		colorScheme: 'scheme01',
+		seriesGroups:
+		[{
+		            type: 'line',
+		            columnsGapPercent: 30,
+		            seriesGapPercent: 0,
+
+		            series: [{ dataField: 'Temperature' }]
+		}]
+	});
 	
-	/* Function déclenché par interaction */
+	$('#sampleNumber').jqxSlider({
+		width: '200px',
+		tooltip: true,
+		min: 3, max: 30,
+		mode: "fixed",
+		ticksFrequency: 1,
+		value: 5
+	});
+
+	/**************************************
+	 * Function déclenché par interaction *
+	 **************************************/
+	
 	$('#VADC').on('change', function (event) {
 		AJAX_VADC = event.args.value;
 	});
@@ -72,10 +100,10 @@ $(document).ready(function () {
 		var vcc = $('#VCC').val();
 
 		if ($('#VADC').val() > vcc) {
-			$('#VADC').jqxSlider({value: vcc});
+			$('#VADC').jqxSlider({ value: vcc });
 		}
 
-		$('#VADC').jqxSlider({max: vcc});
+		$('#VADC').jqxSlider({ max: vcc });
 		AJAX_VCC = vcc;
 	});
 
@@ -105,6 +133,13 @@ $(document).ready(function () {
 		var stop2 = gRange / 2.33 + gMin;
 		var stop3 = gRange / 7 + gMin;
 
+		$('#tempChart').jqxChart({
+			valueAxis: {
+				minValue: gMin,
+				maxValue: gMax
+			}
+		});
+		
 		$('#tempGauge').jqxGauge({
 			ranges: [{startValue: gMin, endValue: stop3 - 1, style: {fill: '#00bbff', stroke: '#00bbff'}, endWidth: 8, startWidth: 15, startDistance: 10, endDistance: 10},
 				{startValue: stop3, endValue: stop2 - 1, style: {fill: '#2ab315', stroke: '#2ab315'}, endWidth: 8, startWidth: 8, startDistance: 10, endDistance: 10},

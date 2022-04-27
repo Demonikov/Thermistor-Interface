@@ -58,9 +58,14 @@
 				<div class="cUnit" id="UNIT_F">Fahraneint</div>
 				<div class="cUnit" id="UNIT_K">Kelvin</div>
 			</div>
+			<div class="lineContainer">
+				<span>Nombre d'échantillon</span>
+				<div class="inputContainer" id="sampleNumber" style="float: right"></div>
+			</div>
 		</div>
-		<div id=tempChart></div>
 		<div id="tempGauge"></div>
+		<div id="tempChart"></div>
+
 	</div>
 </body>
 </html>
