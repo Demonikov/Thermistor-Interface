@@ -3,7 +3,6 @@
  * Retourne les dernières mesures de température sur le serveur SQL
  * */
 
-
 $db = $_GET['DB'];
 
 // Nombre de ligne à demander au serveur SQL

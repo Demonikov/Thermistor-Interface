@@ -1,7 +1,38 @@
 var AJAX_VCC = 5;
 var AJAX_RDIV = 10000;
 var AJAX_VADC = 2.5;
-var AJAX_UNIT = 'C';
+var AJAX_UNIT = "C";
+
+function convertUnit(temp, sendUnit, getUnit)
+{
+	if (sendUnit == getUnit)
+		return temp;
+
+	console.log("Temp: " + temp + " Unit: " + sendUnit + " Requested Unit: " + getUnit);
+	switch (sendUnit){
+	case "C":
+		if (getUnit == "F")
+			temp = (temp * 1.8) + 32;
+		else if(getUnit == "K")
+			temp += 273.15;
+		break;
+	case "F":
+		if (getUnit == "C")
+			temp = (5 * (temp - 32)) / 9;
+		else if(getUnit == "K")
+			temp = (temp + 459.67) / 1.8;
+		break;
+	case "K":
+		if (getUnit == "C")
+			temp -= 273.15;
+		else if(getUnit == "F")
+			temp = temp * 1.8 - 459.67;
+		break;
+	};
+	
+	console.log("Result: " + temp);
+	return temp;
+}
 
 function reset(){
 	$.ajax({
@@ -12,14 +43,20 @@ function reset(){
 
 function getLastTemp(){
 	$.getJSON("lastTemp.php",
-		{'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val')},
+		{'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val'), 'UNIT':AJAX_UNIT},
 		function(json) {
-			$('#tempChart').jqxChart({
-				source: json
-			});
 			$('#tempGauge').jqxGauge({
 				caption: {value: json[0].Temperature + '°' + json[0].Unit},
-				value: json[0].Temperature
+				value: json[0].Temperature 
+			});
+			
+			for (let i = 0; i < json.length; i++){
+				json[i].Temperature = convertUnit(parseFloat(json[i].Temperature), json[i].Unit, AJAX_UNIT);
+				json[i].Unit = AJAX_UNIT;
+			}
+			
+			$('#tempChart').jqxChart({
+				source: json
 			});
 	});
 }
@@ -29,9 +66,8 @@ var intervalId = window.setInterval(function(){
 	$.ajax({
 		url: "ajax.php",
 		data: {'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT}
-		});
-	getLastTemp();
-}, 500)
+		}).success (getLastTemp());
+}, 1000)
 
 $(document).ready(function () {
 	// Objects creation
@@ -65,7 +101,7 @@ $(document).ready(function () {
 	$('#tempChart').jqxChart({
 		title: "Graphique des températures",
 		description: "Compilation des dernières mesures",
-		//source: sampleData,
+		//source: AJAX_RESULT,
 		categoryAxis: { dataField: 'Time' },
 		colorScheme: 'scheme01',
 		seriesGroups:
@@ -77,6 +113,10 @@ $(document).ready(function () {
 		            series: [{ dataField: 'Temperature' }]
 		}]
 	});
+
+	//$('#tempChart').jqxChart('source')._source.url = "lastTemp.php?DB=temperature";
+	//$('#tempChart').jqxChart('source').dataBind();
+	//$('#tempChart').jqxChart('update');
 	
 	$('#sampleNumber').jqxSlider({
 		width: '200px',
@@ -118,13 +158,13 @@ $(document).ready(function () {
 		if ($('#UNIT_F').jqxRadioButton('checked')) {
 			gMax = 230;
 			gMin = -22;
-			AJAX_UNIT = 'F';
+			AJAX_UNIT = "F";
 		} else if ($('#UNIT_K').jqxRadioButton('checked')) {
 			gMax = 383.15;
 			gMin = 243.15;
-			AJAX_UNIT = 'K';
+			AJAX_UNIT = "K";
 		} else {
-			AJAX_UNIT = 'C';
+			AJAX_UNIT = "C";
 		}
 
 		// For gauge color strokes
