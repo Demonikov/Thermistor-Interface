@@ -8,7 +8,6 @@ function convertUnit(temp, sendUnit, getUnit)
 	if (sendUnit == getUnit)
 		return temp;
 
-	console.log("Temp: " + temp + " Unit: " + sendUnit + " Requested Unit: " + getUnit);
 	switch (sendUnit){
 	case "C":
 		if (getUnit == "F")
@@ -30,7 +29,6 @@ function convertUnit(temp, sendUnit, getUnit)
 		break;
 	};
 	
-	console.log("Result: " + temp);
 	return temp;
 }
 
@@ -42,32 +40,41 @@ function reset(){
 }
 
 function getLastTemp(){
-	$.getJSON("lastTemp.php",
-		{'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val'), 'UNIT':AJAX_UNIT},
-		function(json) {
-			$('#tempGauge').jqxGauge({
-				caption: {value: json[0].Temperature + '°' + json[0].Unit},
-				value: json[0].Temperature 
-			});
-			
-			for (let i = 0; i < json.length; i++){
-				json[i].Temperature = convertUnit(parseFloat(json[i].Temperature), json[i].Unit, AJAX_UNIT);
-				json[i].Unit = AJAX_UNIT;
-			}
-			
-			$('#tempChart').jqxChart({
-				source: json
-			});
+	$.getJSON("lastTemp.php", {'DB':"schema", 'NUM':1}, function(result){
+		$('#tempGauge').jqxGauge({
+			caption: {value: result[0].Temperature + '°' + AJAX_UNIT},
+			value: result[0].Temperature
+		});
 	});
+}
+
+function sendParameters(){
+	$.ajax({
+		url: "ajax.php",
+		data: {'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT}
+	}).success (getLastTemp());
+
 }
 
 
 var intervalId = window.setInterval(function(){
-	$.ajax({
-		url: "ajax.php",
-		data: {'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT}
-		}).success (getLastTemp());
-}, 1000)
+	sendParameters();
+}, 500)
+
+var graphUpdate = window.setInterval(function(){
+	$.getJSON("lastTemp.php", {'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val')},
+	function(json) {
+		for (let i = 0; i < json.length; i++){
+			json[i].Temperature = convertUnit(json[i].Temperature, json[i].Unit, AJAX_UNIT);
+			json[i].Unit = AJAX_UNIT;
+		}
+		
+		$('#tempChart').jqxChart({
+			source: json
+		});
+	});
+}, 2000)
+
 
 $(document).ready(function () {
 	// Objects creation
@@ -152,19 +159,19 @@ $(document).ready(function () {
 	});
 
 	$('.cUnit').on('checked', function () {
-		var gMax = 110;
-		var gMin = -30;
 
 		if ($('#UNIT_F').jqxRadioButton('checked')) {
-			gMax = 230;
-			gMin = -22;
 			AJAX_UNIT = "F";
+			var gMax = 230;
+			var gMin = -22;
 		} else if ($('#UNIT_K').jqxRadioButton('checked')) {
-			gMax = 383.15;
-			gMin = 243.15;
 			AJAX_UNIT = "K";
+			var gMax = 383.15;
+			var gMin = 243.15;
 		} else {
 			AJAX_UNIT = "C";
+			var gMax = 110;
+			var gMin = -30;
 		}
 
 		// For gauge color strokes
@@ -173,6 +180,8 @@ $(document).ready(function () {
 		var stop2 = gRange / 2.33 + gMin;
 		var stop3 = gRange / 7 + gMin;
 
+		sendParameters();
+		
 		$('#tempChart').jqxChart({
 			valueAxis: {
 				minValue: gMin,
