@@ -5,7 +5,8 @@
  *
  * @author Vincent D.
  */
-class Thermistor {
+class Thermistor
+{
 	
 protected $Vcc = 5;
 protected $Rdiv = 10000;

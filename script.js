@@ -34,13 +34,13 @@ function convertUnit(temp, sendUnit, getUnit)
 
 function reset(){
 	$.ajax({
-		url: "resetTable.php",
+		url: "script/resetTable.php",
 		data: {'DB': "schema"}
 	});
 }
 
 function getLastTemp(){
-	$.getJSON("lastTemp.php", {'DB':"schema", 'NUM':1}, function(result){
+	$.getJSON("script/lastTemp.php", {'DB':"schema", 'NUM':1}, function(result){
 		$('#tempGauge').jqxGauge({
 			caption: {value: result[0].Temperature + '°' + AJAX_UNIT},
 			value: result[0].Temperature
@@ -50,10 +50,9 @@ function getLastTemp(){
 
 function sendParameters(){
 	$.ajax({
-		url: "ajax.php",
+		url: "script/sendData.php",
 		data: {'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT}
 	}).success (getLastTemp());
-
 }
 
 
@@ -62,7 +61,7 @@ var intervalId = window.setInterval(function(){
 }, 500)
 
 var graphUpdate = window.setInterval(function(){
-	$.getJSON("lastTemp.php", {'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val')},
+	$.getJSON("script/lastTemp.php", {'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val')},
 	function(json) {
 		for (let i = 0; i < json.length; i++){
 			json[i].Temperature = convertUnit(json[i].Temperature, json[i].Unit, AJAX_UNIT);

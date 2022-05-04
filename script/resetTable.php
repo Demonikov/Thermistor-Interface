@@ -1,6 +1,5 @@
 <?php
+require_once('../class/classSQLi.php');
 
-include_once('classSQLi.php');
 $tempCON = new SQLi();
-
 $tempCON->resetTable("temperature");
