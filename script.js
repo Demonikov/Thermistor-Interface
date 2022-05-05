@@ -34,25 +34,29 @@ function convertUnit(temp, sendUnit, getUnit)
 
 function reset(){
 	$.ajax({
-		url: "script/resetTable.php",
-		data: {'DB': "schema"}
+		url	:	"script/resetTable.php",
+		data	:	{'DB': "schema"}
 	});
 }
 
 function getLastTemp(){
-	$.getJSON("script/lastTemp.php", {'DB':"schema", 'NUM':1}, function(result){
-		$('#tempGauge').jqxGauge({
-			caption: {value: result[0].Temperature + '°' + AJAX_UNIT},
-			value: result[0].Temperature
-		});
+	$.getJSON(
+		"script/lastTemp.php",
+		{'DB':"schema", 'NUM':1},
+		function(result){
+			$('#tempGauge').jqxGauge({
+				caption: {value: result[0].Temperature + '°' + AJAX_UNIT},
+				value: result[0].Temperature,
+			});
 	});
 }
 
 function sendParameters(){
 	$.ajax({
-		url: "script/sendData.php",
-		data: {'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT}
-	}).success (getLastTemp());
+		url 	: 	"script/sendData.php",
+		data 	: 	{'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT},
+		success :	getLastTemp(),
+	});
 }
 
 
@@ -61,17 +65,19 @@ var intervalId = window.setInterval(function(){
 }, 500)
 
 var graphUpdate = window.setInterval(function(){
-	$.getJSON("script/lastTemp.php", {'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val')},
-	function(json) {
-		for (let i = 0; i < json.length; i++){
-			json[i].Temperature = convertUnit(json[i].Temperature, json[i].Unit, AJAX_UNIT);
-			json[i].Unit = AJAX_UNIT;
-		}
-		
-		$('#tempChart').jqxChart({
-			source: json
+	$.getJSON(
+		"script/lastTemp.php",
+		{'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val')},
+		function(json) {
+			for (let i = 0; i < json.length; i++){
+				json[i].Temperature = convertUnit(json[i].Temperature, json[i].Unit, AJAX_UNIT);
+				json[i].Unit = AJAX_UNIT;
+			}
+			
+			$('#tempChart').jqxChart({
+				source: json
+			});
 		});
-	});
 }, 2000)
 
 
