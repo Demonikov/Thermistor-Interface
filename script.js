@@ -1,6 +1,4 @@
 var AJAX_VCC = 5;
-var AJAX_RDIV = 10000;
-var AJAX_VADC = 2.5;
 var AJAX_UNIT = "C";
 
 function convertUnit(temp, sendUnit, getUnit)
@@ -9,12 +7,6 @@ function convertUnit(temp, sendUnit, getUnit)
 		return temp;
 
 	switch (sendUnit){
-	case "C":
-		if (getUnit == "F")
-			temp = (temp * 1.8) + 32;
-		else if(getUnit == "K")
-			temp += 273.15;
-		break;
 	case "F":
 		if (getUnit == "C")
 			temp = (5 * (temp - 32)) / 9;
@@ -26,6 +18,12 @@ function convertUnit(temp, sendUnit, getUnit)
 			temp -= 273.15;
 		else if(getUnit == "F")
 			temp = temp * 1.8 - 459.67;
+		break;
+	default:
+		if (getUnit == "F")
+			temp = (temp * 1.8) + 32;
+		else if(getUnit == "K")
+			temp += 273.15;
 		break;
 	};
 	
@@ -39,10 +37,10 @@ function reset(){
 	});
 }
 
-function getLastTemp(){
+function updateGauge(){
 	$.getJSON(
 		"script/lastTemp.php",
-		{'DB':"schema", 'NUM':1, 'TABLE':'temperature'},
+		{'DB':"schema", 'NUM':1, 'TABLE':'adc'},
 		function(result){
 			$('#tempGauge').jqxGauge({
 				caption: {value: result[0].Temperature + '°' + AJAX_UNIT},
@@ -51,23 +49,10 @@ function getLastTemp(){
 	});
 }
 
-function sendParameters(){
-	$.ajax({
-		url 	: 	"script/sendData.php",
-		data 	: 	{'VCC': AJAX_VCC, 'VADC': AJAX_VADC, 'RDIV': AJAX_RDIV, 'UNIT': AJAX_UNIT},
-		success :	getLastTemp(),
-	});
-}
-
-
-var intervalId = window.setInterval(function(){
-	sendParameters();
-}, 500)
-
-var graphUpdate = window.setInterval(function(){
+function updateGraph(){
 	$.getJSON(
 		"script/lastTemp.php",
-		{'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val'), 'TABLE':'temperature'},
+		{'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val'), 'TABLE':'adc'},
 		function(json) {
 			for (let i = 0; i < json.length; i++){
 				json[i].Temperature = convertUnit(json[i].Temperature, json[i].Unit, AJAX_UNIT);
@@ -78,17 +63,27 @@ var graphUpdate = window.setInterval(function(){
 				source: json
 			});
 		});
+}
+
+function sendParameters(){
+	$.ajax({
+		url 	: 	"script/sendData.php",
+		data 	: 	{'DB':"schema", 'VCC':AJAX_VCC},
+		success :	updateGauge(),
+	});
+}
+
+
+var intervalId = window.setInterval(function(){
+	sendParameters();
+}, 500)
+
+var intervalGraph = window.setInterval(function(){
+	updateGraph();
 }, 2000)
 
 $(document).ready(function () {
 	// Objects creation
-	$('#VADC').jqxSlider({
-		width: '200px',
-		tooltip: true,
-		min: 0.01, max: AJAX_VCC,
-		value: 2.5
-	});
-
 	// VCC
 	$("#VCC").jqxComboBox({
 		autoComplete: true,
@@ -97,14 +92,7 @@ $(document).ready(function () {
 		dropDownHeight: 120,
 		width: '200px'
 	});
-
-	// RDIV
-	$('#RDIV').jqxNumberInput({
-		//unit: "ohm",
-		min: 100, max: 100000,
-		decimal: AJAX_RDIV
-	});
-
+	
 	// Unit radios
 	$('.cUnit').jqxRadioButton({ width: 140, height: 25 });
 
@@ -136,25 +124,9 @@ $(document).ready(function () {
 	/**************************************
 	 * Function déclenché par interaction *
 	 **************************************/
-	
-	$('#VADC').on('change', function (event) {
-		AJAX_VADC = event.args.value;
-	});
-
 	// bind to 'select' event.
 	$('#VCC').bind('select', function () {
-		var vcc = $('#VCC').val();
-
-		if ($('#VADC').val() > vcc) {
-			$('#VADC').jqxSlider({ value: vcc });
-		}
-
-		$('#VADC').jqxSlider({ max: vcc });
-		AJAX_VCC = vcc;
-	});
-
-	$('#RDIV').on('valueChanged', function () {
-		AJAX_RDIV = $('#RDIV').val();
+		AJAX_VCC = $('#VCC').val();
 	});
 
 	$('.cUnit').on('checked', function () {
@@ -179,8 +151,6 @@ $(document).ready(function () {
 		var stop2 = gRange / 2.33 + gMin;
 		var stop3 = gRange / 7 + gMin;
 
-		sendParameters();
-		
 		$('#tempChart').jqxChart({
 			valueAxis: {
 				minValue: gMin,
@@ -195,6 +165,9 @@ $(document).ready(function () {
 				{startValue: stop1, endValue: gMax - 1, style: {fill: '#ff0000', stroke: '#ff0000'}, endWidth: 20, startWidth: 15, startDistance: 10, endDistance: 10}],
 			min: gMin, max: gMax
 		});
+
+		sendParameters();
+		updateGraph();
 	});
 
 	$('#UNIT_C').jqxRadioButton({checked: true});

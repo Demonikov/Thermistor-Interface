@@ -1,18 +1,12 @@
 <?php
 
-/**
- * Description of classThermistor
- *
- * @author Vincent D.
- */
 class Thermistor
 {
 	
-protected $Vcc = 5;
-protected $Rdiv = 10000;
-protected $Vadc = 2.5;
-// Unité accepté: C, F, K
-protected $Unit = "C";
+protected $Vcc;
+protected $Rdiv;
+protected $Vadc;
+protected $Unit;
 private $tblConvert = array(array(111.3, -30.0),
 	array(86.39, -25), array(67.74, -20), array(53.39, -15),
 	array(42.45, -10), array(33.89, -5), array(27.28, 0),
@@ -25,32 +19,43 @@ private $tblConvert = array(array(111.3, -30.0),
 	array(1.108, 95), array(0.9735, 100), array(0.8574, 105),
 	array(0.7579, 110));
 
-function __construct() {
+function __construct()
+{
 	if (filter_input(INPUT_GET, 'VCC', FILTER_VALIDATE_FLOAT))
 		$this->Vcc = $_GET['VCC'];
+	else
+		$this->Vcc = 5;
 	
 	if (filter_input(INPUT_GET, 'RDIV', FILTER_VALIDATE_FLOAT))
 		$this->Rdiv = $_GET['RDIV'];
+	else
+		$this->Rdiv = 10000;
 	
 	if (filter_input(INPUT_GET, 'VADC', FILTER_VALIDATE_FLOAT))
 		$this->Vadc = $_GET['VADC'];
+	else
+		$this->Vadc = 2.5;
 	
 	//if (filter_input(INPUT_GET, 'UNIT', FILTER_VALIDATE_TEXT))
 	if ($_GET['UNIT'])
 		$this->Unit = $_GET['UNIT'];
+	else
+		$this->Unit = "C";
 
 	$this->calcTemp();
 }
 
 // Valeur des composantes et température
-public function printPars() {
+public function printPars()
+{
 	echo '<pre>';
 	printf("Température:\t %.2f°%s", $this->getTemp(), $this->Unit);
 	echo '</pre>';
 }
 
 // Estime la température capté par le transistor selon les équivalences Rt / T connues
-public function calcTemp() {
+public function calcTemp()
+{
 	$trueRt = ($this->Vadc * $this->Rdiv) / ($this->Vcc - $this->Vadc) / 1000;
 	if ($trueRt > 111) {
 		$this->Temp = -30;
@@ -88,22 +93,22 @@ public function calcTemp() {
 	return;
 }
 
+public function setVadc($newVadc)
+{
+	$this->Vadc = $newVadc;
+	$this->calcTemp();
+}
+
+
 // Retourne la température dans l'unité configuré
-public function getTemp() {
+public function getTemp()
+{
 	return json_encode( array("Temperature" => $this->Temp, "Unit" => $this->Unit) );
 }
 
-public function sendToDB() {
-$db = "schema";
-$sql_con = mysqli_connect("localhost", "phpmyadmin", "phpmyadmin", $db);
-if (!$sql_con)
-	die("Could not connect:" . mysqli_error());
-
-$this->Vadc = number_format( (float) $this->Vadc, 2);
-$sql = "INSERT INTO temperature (Temperature, Unit, Vcc, Vadc, Rdiv) VALUES " .
-	"('$this->Temp', '$this->Unit' , '$this->Vcc' , '$this->Vadc' , '$this->Rdiv')";
-$result = mysqli_query($sql_con, $sql);
-
-mysqli_close($sql_con);
+public function sendToDB()
+{
+	$this->Vadc = number_format( (float) $this->Vadc, 2);
+	return "INSERT INTO temperature (Temperature, Unit, Vcc, Vadc, Rdiv) VALUES " . "('$this->Temp', '$this->Unit' , '$this->Vcc' , '$this->Vadc' , '$this->Rdiv')";
 }
 }

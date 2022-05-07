@@ -4,14 +4,12 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Thermistor Simulation</title>
+
+	<script type="text/javascript" src="../jqwidgets/scripts/jquery-1.12.4.min.js"></script>
 	
 	<link rel="stylesheet" href="w3.css">
 	<link rel="stylesheet" href="../jqwidgets/jqwidgets/styles/jqx.base.css">
 	<link rel="stylesheet" href="default.css">
-	
-	<script type="text/javascript" src="script.js"></script>
-	
-	<script type="text/javascript" src="../jqwidgets/scripts/jquery-1.12.4.min.js"></script>
 
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxcore.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxbuttons.js"></script>
@@ -26,6 +24,8 @@
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxchart.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxdraw.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxdata.js"></script>
+
+	<script type="text/javascript" src="script.js"></script>
 </head>
 
 <nav>
@@ -41,14 +41,6 @@
 			<div class="lineContainer">
 				<span>VCC</span>
 				<div class="inputContainer" id='VCC'></div>
-			</div>
-			<div class="lineContainer">
-				<span>RDIV</span>
-				<div class="inputContainer" id='RDIV'></div>
-			</div>
-			<div class="lineContainer">
-				<span>VADC</span>
-				<div class="inputContainer" id='VADC' style="float: right"></div>
 			</div>
 			<div id="UnitList" class="lineContainter">
 				<div class="cUnit" id="UNIT_C">Celsius</div>

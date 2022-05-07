@@ -10,8 +10,7 @@ function __construct()
 {
 	$db = $_GET['DB'];
 	$this->table = $_GET['TABLE'];
-
-	console.log($this->table);
+	
 	$this->con = new mysqli("localhost", "phpmyadmin", "phpmyadmin", $db);
 
 	if ($this->con->connect_error)
@@ -23,13 +22,14 @@ public function resetTable()
 {
 	$this->con->query("DELETE FROM $this->table");
 	$this->con->query("ALTER TABLE $this->table AUTO_INCREMENT=1");
+	$this->con->query("DELETE FROM adc");
+	$this->con->query("ALTER TABLE adc AUTO_INCREMENT=1");
 }
 
 // Send 
 public function sqlQuery($query)
 {
 	$result = $this->con->query($query);
-	
 	// Transforme la réponse en JSON
 	if ($result->num_rows > 0) {
 		for ($i = 0; $i < $result->num_rows; $i++)
