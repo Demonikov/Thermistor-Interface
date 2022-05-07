@@ -35,14 +35,14 @@ function convertUnit(temp, sendUnit, getUnit)
 function reset(){
 	$.ajax({
 		url	:	"script/resetTable.php",
-		data	:	{'DB': "schema"}
+		data	:	{'DB': "schema", 'TABLE':"temperature"},
 	});
 }
 
 function getLastTemp(){
 	$.getJSON(
 		"script/lastTemp.php",
-		{'DB':"schema", 'NUM':1},
+		{'DB':"schema", 'NUM':1, 'TABLE':'temperature'},
 		function(result){
 			$('#tempGauge').jqxGauge({
 				caption: {value: result[0].Temperature + '°' + AJAX_UNIT},
@@ -67,7 +67,7 @@ var intervalId = window.setInterval(function(){
 var graphUpdate = window.setInterval(function(){
 	$.getJSON(
 		"script/lastTemp.php",
-		{'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val')},
+		{'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val'), 'TABLE':'temperature'},
 		function(json) {
 			for (let i = 0; i < json.length; i++){
 				json[i].Temperature = convertUnit(json[i].Temperature, json[i].Unit, AJAX_UNIT);
@@ -79,7 +79,6 @@ var graphUpdate = window.setInterval(function(){
 			});
 		});
 }, 2000)
-
 
 $(document).ready(function () {
 	// Objects creation
@@ -121,14 +120,9 @@ $(document).ready(function () {
 		            type: 'line',
 		            columnsGapPercent: 30,
 		            seriesGapPercent: 0,
-
 		            series: [{ dataField: 'Temperature' }]
 		}]
 	});
-
-	//$('#tempChart').jqxChart('source')._source.url = "lastTemp.php?DB=temperature";
-	//$('#tempChart').jqxChart('source').dataBind();
-	//$('#tempChart').jqxChart('update');
 	
 	$('#sampleNumber').jqxSlider({
 		width: '200px',
@@ -202,7 +196,6 @@ $(document).ready(function () {
 			min: gMin, max: gMax
 		});
 	});
-	
 
 	$('#UNIT_C').jqxRadioButton({checked: true});
 });

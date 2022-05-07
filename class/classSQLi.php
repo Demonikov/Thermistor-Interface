@@ -4,22 +4,41 @@ class SQLi
 {
 
 protected $con;
+protected $table;
 
 function __construct()
 {
 	$db = $_GET['DB'];
+	$this->table = $_GET['TABLE'];
+
+	console.log($this->table);
 	$this->con = new mysqli("localhost", "phpmyadmin", "phpmyadmin", $db);
 
 	if ($this->con->connect_error)
 		die("Could not connect:" . $this->con->mysqli_error());
 }
 
-public function resetTable($table)
+// Erase all table entries
+public function resetTable()
 {
-	$sql = "DELETE FROM $table";
-	$this->con->query($sql);
-	$sql = "ALTER TABLE $table AUTO_INCREMENT=1";
-	$this->con->query($sql);
+	$this->con->query("DELETE FROM $this->table");
+	$this->con->query("ALTER TABLE $this->table AUTO_INCREMENT=1");
+}
+
+// Send 
+public function sqlQuery($query)
+{
+	$result = $this->con->query($query);
+	
+	// Transforme la réponse en JSON
+	if ($result->num_rows > 0) {
+		for ($i = 0; $i < $result->num_rows; $i++)
+			$array[] = $result->fetch_assoc();
+	}else{
+		return "No data";
+	}
+	
+	return json_encode($array);
 }
 
 public function getLastEntries()
@@ -29,22 +48,8 @@ public function getLastEntries()
 	else
 		$num = 1;
 
-
-	$sql = "SELECT Temperature,Unit,Time FROM temperature ORDER BY ID DESC LIMIT $num";
-	$result = $this->con->query($sql);
- 
-	// Transforme la réponse en JSON
-	if ($result->num_rows > 0) {
-		for ($i = 0; $i < $result->num_rows; $i++)
-			$array[] = $result->fetch_assoc();
-	
-		echo json_encode($array);
-	}else{
-		return "No data";
-	}
-	
-	return json_encode($array);
-}
+	return $this->sqlQuery("SELECT * FROM $this->table ORDER BY ID DESC LIMIT $num");
+ }
 
 function __destruct()
 {

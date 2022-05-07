@@ -3,30 +3,27 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>LAB 6</title>
+	<title>Thermistor Simulation</title>
 	
 	<link rel="stylesheet" href="w3.css">
 	<link rel="stylesheet" href="../jqwidgets/jqwidgets/styles/jqx.base.css">
 	<link rel="stylesheet" href="default.css">
 	
-	<script type="text/javascript" src="../jqwidgets/scripts/jquery-1.12.4.min.js"></script>
-	
 	<script type="text/javascript" src="script.js"></script>
+	
+	<script type="text/javascript" src="../jqwidgets/scripts/jquery-1.12.4.min.js"></script>
+
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxcore.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxbuttons.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxslider.js"></script>
-	
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxdropdownlist.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxscrollbar.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxlistbox.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxcombobox.js"></script>
-	
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxnumberinput.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxradiobutton.js"></script>
-	
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxgauge.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxchart.js"></script>
-	
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxdraw.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxdata.js"></script>
 </head>
