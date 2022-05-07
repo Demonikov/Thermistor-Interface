@@ -9,10 +9,8 @@
 	<link rel="stylesheet" href="../jqwidgets/jqwidgets/styles/jqx.base.css">
 	<link rel="stylesheet" href="default.css">
 	
-	<script type="text/javascript" src="script.js"></script>
-	
 	<script type="text/javascript" src="../jqwidgets/scripts/jquery-1.12.4.min.js"></script>
-
+	
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxcore.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxbuttons.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxslider.js"></script>
@@ -26,7 +24,9 @@
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxchart.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxdraw.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxdata.js"></script>
-</head>
+	
+	<script type="text/javascript" src="script.js"></script>
+	</head>
 
 <nav>
 	<div class="w3-container w3-bar w3-light-grey">
