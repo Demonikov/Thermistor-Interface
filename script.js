@@ -3,8 +3,7 @@ var AJAX_UNIT = "C";
 
 function convertUnit(temp, sendUnit, getUnit)
 {
-	if (sendUnit == getUnit)
-		return temp;
+	temp = parseFloat(temp);
 
 	switch (sendUnit){
 	case "F":
@@ -22,11 +21,11 @@ function convertUnit(temp, sendUnit, getUnit)
 	default:
 		if (getUnit == "F")
 			temp = (temp * 1.8) + 32;
-		else if(getUnit == "K")
+		else if(getUnit == "K"){
 			temp += 273.15;
+		}
 		break;
 	};
-	
 	return temp;
 }
 
@@ -43,8 +42,8 @@ function updateGauge(){
 		{'DB':"schema", 'NUM':1, 'TABLE':'adc'},
 		function(result){
 			$('#tempGauge').jqxGauge({
-				caption: {value: result[0].Temperature + '°' + AJAX_UNIT},
-				value: result[0].Temperature,
+				caption: {value: convertUnit(result[0].Temperature, "", AJAX_UNIT) + '°' + AJAX_UNIT},
+				value: (convertUnit(result[0].Temperature, "", AJAX_UNIT)).toFixed(2),
 			});
 	});
 }
