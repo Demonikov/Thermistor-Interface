@@ -1,6 +1,9 @@
-var AJAX_VCC = 5;
-var AJAX_UNIT = "C";
+var AJAX_VCC;
+var AJAX_UNIT;
+var tMin = -30;
+var tMax = 110; 
 
+// Convert temperature from one unit to an other
 function convertUnit(temp, sendUnit, getUnit)
 {
 	temp = parseFloat(temp);
@@ -16,7 +19,7 @@ function convertUnit(temp, sendUnit, getUnit)
 		if (getUnit == "C")
 			temp -= 273.15;
 		else if(getUnit == "F")
-			temp = temp * 1.8 - 459.67;
+			temp = (temp * 1.8) - 459.67;
 		break;
 	default:
 		if (getUnit == "F")
@@ -26,29 +29,33 @@ function convertUnit(temp, sendUnit, getUnit)
 		}
 		break;
 	};
-	return temp;
+	return temp.toFixed(2);
 }
 
+// Reset all used table
 function reset(){
 	$.ajax({
 		url	:	"script/resetTable.php",
-		data	:	{'DB': "schema", 'TABLE':"temperature"},
+		data	:	{'DB': "schema"},
 	});
 }
 
-function updateGauge(){
+// Update Gauge
+function getCurrentTemp(){
 	$.getJSON(
 		"script/lastTemp.php",
 		{'DB':"schema", 'NUM':1, 'TABLE':'adc'},
 		function(result){
 			$('#tempGauge').jqxGauge({
-				caption: {value: convertUnit(result[0].Temperature, "", AJAX_UNIT) + '°' + AJAX_UNIT},
-				value: (convertUnit(result[0].Temperature, "", AJAX_UNIT)).toFixed(2),
+				caption: {value: convertUnit(result[0].Temperature, "C", AJAX_UNIT) + '°' + AJAX_UNIT},
+				value: convertUnit(result[0].Temperature, "C", AJAX_UNIT),
 			});
 	});
+
 }
 
-function updateGraph(){
+// Update Chart
+function updateChart(){
 	$.getJSON(
 		"script/lastTemp.php",
 		{'DB':"schema", 'NUM':$('#sampleNumber').jqxSlider('val'), 'TABLE':'adc'},
@@ -61,113 +68,100 @@ function updateGraph(){
 			$('#tempChart').jqxChart({
 				source: json
 			});
-		});
-}
-
-function sendParameters(){
-	$.ajax({
-		url 	: 	"script/sendData.php",
-		data 	: 	{'DB':"schema", 'VCC':AJAX_VCC},
-		success :	updateGauge(),
 	});
 }
 
-
-var intervalId = window.setInterval(function(){
-	sendParameters();
+// Write temperature and targeted temperature to their respective database
+// Also perform gauge update and check if target temperature as been reach
+var LiveFeed = window.setInterval(function(){
+	console.log (  );
+	
+	$.ajax({
+		url 	: 	"script/sendData.php",
+		data 	: 	{'DB':"schema", 'TARGET':$('#target').jqxSlider('val'), 'TARGET_STATE': $("#ThermState").is(":checked")},
+	});
+	getCurrentTemp();
 }, 500)
 
-var intervalGraph = window.setInterval(function(){
-	updateGraph();
+// Chart update interval
+var intervalChart = window.setInterval(function(){
+	updateChart();
 }, 2000)
 
 $(document).ready(function () {
-	// Objects creation
-	// VCC
-	$("#VCC").jqxComboBox({
-		autoComplete: true,
-		source: [3.3, 5, 10, 12, 24],
-		selectedIndex: 1,
-		dropDownHeight: 120,
-		width: '200px'
-	});
-	
-	// Unit radios
-	$('.cUnit').jqxRadioButton({ width: 140, height: 25 });
+	// Unit radios dimensions
+	$(".cUnit").jqxRadioButton({ width: 140, height: 25 });
 
-	$('#tempGauge').jqxGauge({ value: 25 });
-	$('#tempChart').jqxChart({
-		title: "Graphique des températures",
+	$("#tempGauge").jqxGauge();
+	$("#tempChart").jqxChart({
+		title: "Températures",
 		description: "Compilation des dernières mesures",
-		//source: AJAX_RESULT,
 		categoryAxis: { dataField: 'Time' },
-		colorScheme: 'scheme01',
 		seriesGroups:
 		[{
 		            type: 'line',
-		            columnsGapPercent: 30,
-		            seriesGapPercent: 0,
 		            series: [{ dataField: 'Temperature' }]
 		}]
 	});
 	
-	$('#sampleNumber').jqxSlider({
+	$('#target').jqxSlider({
 		width: '200px',
-		tooltip: true,
+		min: tMin, max: tMax,
+		mode: "fixed",
+		ticksFrequency: 1,
+		value: 21
+	});
+
+	$("#target").on('change', function(event) {
+		$("#targeted").html( event.args.value + "°C");
+	});
+
+	$("#sampleNumber").jqxSlider({
+		width: '200px',
 		min: 3, max: 30,
 		mode: "fixed",
 		ticksFrequency: 1,
 		value: 5
 	});
 
-	/**************************************
-	 * Function déclenché par interaction *
-	 **************************************/
-	// bind to 'select' event.
-	$('#VCC').bind('select', function () {
-		AJAX_VCC = $('#VCC').val();
+	$("#sampleNumber").on('change', function(event) {
+		$("#sampleCount").html( event.args.value );
 	});
-
+	
 	$('.cUnit').on('checked', function () {
 
 		if ($('#UNIT_F').jqxRadioButton('checked')) {
 			AJAX_UNIT = "F";
-			var gMax = 230;
-			var gMin = -22;
+			tMax = 230;
+			tMin = -22;
 		} else if ($('#UNIT_K').jqxRadioButton('checked')) {
 			AJAX_UNIT = "K";
-			var gMax = 383.15;
-			var gMin = 243.15;
+			tMax = 383.15;
+			tMin = 243.15;
 		} else {
 			AJAX_UNIT = "C";
-			var gMax = 110;
-			var gMin = -30;
+			tMax = 110;
+			tMin = -30;
 		}
 
 		// For gauge color strokes
-		var gRange = gMax - gMin;
-		var stop1 = gRange / 1.56 + gMin;
-		var stop2 = gRange / 2.33 + gMin;
-		var stop3 = gRange / 7 + gMin;
-
-		$('#tempChart').jqxChart({
-			valueAxis: {
-				minValue: gMin,
-				maxValue: gMax
-			}
-		});
+		var gRange = tMax - tMin;
+		var stop1 = gRange / 1.56 + tMin;
+		var stop2 = gRange / 2.33 + tMin;
+		var stop3 = gRange / 7 + tMin;
 		
 		$('#tempGauge').jqxGauge({
-			ranges: [{startValue: gMin, endValue: stop3 - 1, style: {fill: '#00bbff', stroke: '#00bbff'}, endWidth: 8, startWidth: 15, startDistance: 10, endDistance: 10},
+			ranges: [{startValue: tMin, endValue: stop3 - 1, style: {fill: '#00bbff', stroke: '#00bbff'}, endWidth: 8, startWidth: 15, startDistance: 10, endDistance: 10},
 				{startValue: stop3, endValue: stop2 - 1, style: {fill: '#2ab315', stroke: '#2ab315'}, endWidth: 8, startWidth: 8, startDistance: 10, endDistance: 10},
 				{startValue: stop2, endValue: stop1 - 1, style: {fill: '#ffd000', stroke: '#ffd000'}, endWidth: 15, startWidth: 8, startDistance: 10, endDistance: 10},
-				{startValue: stop1, endValue: gMax - 1, style: {fill: '#ff0000', stroke: '#ff0000'}, endWidth: 20, startWidth: 15, startDistance: 10, endDistance: 10}],
-			min: gMin, max: gMax
+				{startValue: stop1, endValue: tMax - 1, style: {fill: '#ff0000', stroke: '#ff0000'}, endWidth: 20, startWidth: 15, startDistance: 10, endDistance: 10}],
+			min: tMin, max: tMax
 		});
 
-		sendParameters();
-		updateGraph();
+		updateChart();
 	});
 
 	$('#UNIT_C').jqxRadioButton({checked: true});
+	$("#sampleCount").html( $('#sampleNumber').jqxSlider('val') );
+	$("#targeted").html( $('#target').jqxSlider('val') + "°C");
 });

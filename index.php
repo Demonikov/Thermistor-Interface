@@ -39,8 +39,16 @@
 	<div id='content'>
 		<div id=inputSection>
 			<div class="lineContainer">
-				<span>VCC</span>
-				<div class="inputContainer" id='VCC'></div>
+				<span>Thermostat: </span>
+				<span id="targeted"></span>
+				<div class="inputContainer" id='target' style="float: right"></div>
+			</div>
+			<div class="lineContainer">
+				<span>State: </span>
+				<label class="switch">
+					<input type="checkbox" id="ThermState" style="float: right">
+					<span class="slider round"></span>
+				</label>
 			</div>
 			<div id="UnitList" class="lineContainter">
 				<div class="cUnit" id="UNIT_C">Celsius</div>
@@ -48,7 +56,8 @@
 				<div class="cUnit" id="UNIT_K">Kelvin</div>
 			</div>
 			<div class="lineContainer">
-				<span>Nombre d'échantillon</span>
+				<span>Nombre d'échantillon: </span>
+				<span id="sampleCount"></span>
 				<div class="inputContainer" id="sampleNumber" style="float: right"></div>
 			</div>
 		</div>

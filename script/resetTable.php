@@ -2,4 +2,6 @@
 require_once('../class/classSQLi.php');
 
 $tempCON = new SQLi();
-$tempCON->resetTable();
+$tempCON->resetTable("temperature");
+$tempCON->resetTable("adc");
+$tempCON->resetTable("target");
