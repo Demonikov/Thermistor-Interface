@@ -74,12 +74,16 @@ function updateChart(){
 // Write temperature and targeted temperature to their respective database
 // Also perform gauge update and check if target temperature as been reach
 var LiveFeed = window.setInterval(function(){
-	console.log (  );
-	
 	$.ajax({
 		url 	: 	"script/sendData.php",
-		data 	: 	{'DB':"schema", 'TARGET':$('#target').jqxSlider('val'), 'TARGET_STATE': $("#ThermState").is(":checked")},
+		data 	: 	{'DB':"schema", 'TARGET':$('#target').jqxSlider('val'), 'TARGET_STATE': $("#ThermSlider").is(":checked")},
 	});
+
+	if ( $("#ThermSlider").is(":checked") )
+		$("#ThermState").html("État: Actif");
+	else
+		$("#ThermState").html("État: Désactivé");
+
 	getCurrentTemp();
 }, 500)
 

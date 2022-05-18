@@ -19,16 +19,16 @@ function getLastRow($con, $table)
 		return "No data";
 }
 
-shell_exec("raspi-gpio set 13 op");
+shell_exec("raspi-gpio set 17 op");
 
 while (1){
 	$objTarget = getLastRow($SQL_CON, "target");
 	$objTemp = getLastRow($SQL_CON, "adc");
 
 	if ( floatval( $objTarget["Target"] ) >= floatval( $objTemp["Temperature"] ) )
-		shell_exec("raspi-gpio set 13 dh");
+		shell_exec("raspi-gpio set 17 dh");
 	else
-		shell_exec("raspi-gpio set 13 dl");
+		shell_exec("raspi-gpio set 17 dl");
 	sleep(0.5);
 }
 

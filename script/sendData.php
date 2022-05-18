@@ -5,10 +5,10 @@ require_once('../class/classSQLi.php');
 $SQL_CON = new SQLi();
 $Therm1 = new Thermistor();
 
-if ($_GET["TARGET_STATE"])
-	shell_exec("systemctl start Thermostat");
+if ($_GET["TARGET_STATE"] == "true")
+	shell_exec("[ $(ps -C php -f | grep -c target.php) -gt 0 ] || php /var/www/html/script/target.php");
 else
-	shell_exec("systemctl stop Thermostat");
+	shell_exec("pkill php && raspi-gpio set 17 dl");
 
 // Read shield ADC and calculate temperature
 $tmp = json_decode(shell_exec("./shieldpic16f88"), true);

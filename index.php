@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="w3.css">
 	<link rel="stylesheet" href="../jqwidgets/jqwidgets/styles/jqx.base.css">
 	<link rel="stylesheet" href="default.css">
+	<link rel="stylesheet" href="slider.css">
 
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxcore.js"></script>
 	<script type="text/javascript" src="../jqwidgets/jqwidgets/jqxbuttons.js"></script>
@@ -44,10 +45,10 @@
 				<div class="inputContainer" id='target' style="float: right"></div>
 			</div>
 			<div class="lineContainer">
-				<span>State: </span>
+				<span id="ThermState" >State: </span>
 				<label class="switch">
-					<input type="checkbox" id="ThermState" style="float: right">
-					<span class="slider round"></span>
+				      <input type="checkbox" id="ThermSlider" checked>
+				      <span class="slider round"></span>
 				</label>
 			</div>
 			<div id="UnitList" class="lineContainter">
@@ -62,6 +63,13 @@
 			</div>
 		</div>
 		<div id="tempGauge"></div>
+
+		<div class="lineContainer">
+			<span>Nombre d'échantillon: </span>
+			<span id="sampleCount"></span>
+			<div class="inputContainer" id="sampleNumber" style="float: right"></div>
+		</div>
+
 		<div id="tempChart"></div>
 
 	</div>
